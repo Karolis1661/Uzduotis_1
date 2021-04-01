@@ -10,7 +10,7 @@ Prieš:
 
 ![pries](https://user-images.githubusercontent.com/67113855/113311319-dad43700-9311-11eb-9848-18fd242add25.jpg)
 
-Per pokalbį davėte pastabą dėl to jog neišlaisvinu atminties prieš programos pabaigą, tad idėjau naują funkciją kuri programos pabaigoje išvalo rezultatu duomenis.
+Per pokalbį davėte pastabą dėl to, jog neišlaisvinu atminties prieš programos pabaigą, tad idėjau naują funkciją kuri programos pabaigoje išvalo rezultatų duomenis.
 
 Po:
 
