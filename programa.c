@@ -54,10 +54,12 @@ char **mal_str_arr(size_t size);
 char **re_str_arr(char ***arr, int *const new_size);
 void print_results(const struct data_log *data_set);
 
+// Free memory
+void clean_up(struct data_log **data_set);
 
 int main(int argc, char **argv) {
     
-    struct data_log *const user_data = init_struct();
+    struct data_log *user_data = init_struct();
 
     save_cmd_args(argc, argv, &user_data->f_query, &user_data->t_query);
 
@@ -67,6 +69,8 @@ int main(int argc, char **argv) {
 
     print_results(user_data);
 
+    clean_up(&user_data);
+    
     return 0;
 }
 
@@ -175,8 +179,15 @@ void save_results(struct data_log *const data_set) {
         check_file_context(Files.list[i], data_set);
 
         // Clean up
-        free(Files.list[i]);
-        Files.list[i] = NULL; 
+        if(Files.list[i] != NULL) {
+            free(Files.list[i]);
+            Files.list[i] = NULL; 
+        }
+    }
+
+    if(Files.list != NULL) {
+        free(Files.list);
+        Files.list = NULL;
     }
 }
 
@@ -223,7 +234,7 @@ char *mal_str(size_t size) {
     return ptr;
 }
 
-char **re_str_arr(char ***arr, int * const curr_size) {
+char **re_str_arr(char ***arr, int *const curr_size) {
 
     // Dereference pointer and update its size for reallocation
     *curr_size += ARR_INIT_VALUE;
@@ -284,7 +295,7 @@ int check_file_context(const char *file_path, struct data_log *const data_set) {
     */
 
     int line = 0;
-    char *casted_line;
+    char *casted_line = NULL;
     int pos = 0;
     int len = 0;
     FILE *fp;
@@ -310,6 +321,7 @@ int check_file_context(const char *file_path, struct data_log *const data_set) {
 
             // Reallocate memory if needed 
             if (data_set->added_res >= data_set->res_size) {
+                
                 data_set->res = re_str_arr(&data_set->res, &data_set->res_size);
             }
 
@@ -330,10 +342,42 @@ int check_file_context(const char *file_path, struct data_log *const data_set) {
             strcat(data_set->res[pos], " at line: ");
             strcat(data_set->res[pos], casted_line);
             
-            free(casted_line);
+            if(casted_line != NULL) {
+                free(casted_line);
+                casted_line = NULL;
+            }
         }
     }
 
     fclose(fp);
     return 0;
+}
+
+void clean_up(struct data_log **data_set) {
+   
+    for (size_t i = 0; i < (*data_set)->added_res; i++) {
+        free((*data_set)->res[i]);
+        (*data_set)->res[i] = NULL;
+    }
+
+    if((*data_set)->res != NULL) {
+        free((*data_set)->res);
+        (*data_set)->res = NULL;
+    }
+
+    if((*data_set)->t_query != NULL) {
+        free((*data_set)->t_query);
+        (*data_set)->t_query = NULL;
+    }
+
+    if((*data_set)->f_query != NULL) {
+        free((*data_set)->f_query);
+        (*data_set)->f_query = NULL;
+    }
+
+    if(*data_set != NULL) {
+        free(*data_set);
+        *data_set = NULL;
+    }
+
 }
